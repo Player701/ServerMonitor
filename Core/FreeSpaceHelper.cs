@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace ZidiumServerMonitor
 {
@@ -16,8 +17,12 @@ namespace ZidiumServerMonitor
             }
             catch
             {
+                var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
+
                 var drives = DriveInfo.GetDrives();
-                di = drives.FirstOrDefault(t => t.Name.StartsWith(drive, StringComparison.OrdinalIgnoreCase));
+                di = drives.OrderBy(t => t.Name.Length).FirstOrDefault(t => t.Name.StartsWith(drive, comparison));
 
                 if (di == null)
                     return null;
